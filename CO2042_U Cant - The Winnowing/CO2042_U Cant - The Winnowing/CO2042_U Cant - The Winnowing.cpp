@@ -9,7 +9,7 @@ using namespace std;
 struct SProfessor 
 {
     string Name;
-    vector<CCard> InHand;
+    vector<CCard *> InHand;
     int Prestige = 30;
 
 public:
@@ -21,13 +21,15 @@ public:
 
 
 
-CCard splitString(string line) {
+CCard* splitString(string line) {
     int CardType;
     string firstname;
     string lastname;
 
     int power;
     int  resilience;
+
+    
 
     string words[6];
     int index = 0;
@@ -56,8 +58,8 @@ CCard splitString(string line) {
     }
    
     //TODO: add index 6 here
-
-    return CCard(CardType, firstname, lastname, power, resilience);
+    CCard* cardPtr = new CCard(CardType, firstname, lastname, power, resilience);
+    return cardPtr;
 }
 
 int Random(int max)
@@ -92,54 +94,50 @@ int main()
     SProfessor ProfessorPifflePaper = SProfessor("ProfessorPifflePaper");
 
    fstream file;
-   vector<CCard> ProfessorPlagiaristDeck;
-   vector<CCard> ProfessorPifflePaperDeck;
+   vector<CCard *> ProfessorPlagiaristDeck;
+   vector<CCard *> ProfessorPifflePaperDeck;
 
    file.open("plagiarist.txt");
    string line;
    while(getline(file, line)) {
        //cout <<"line : "<< line << endl;
+       //ProfessorPlagiaristDeck.push_back(splitString(line));
+       splitString(line);
        ProfessorPlagiaristDeck.push_back(splitString(line));
-       
+       delete splitString(line);
    }
    file.close();
+    
+    
    //cout << endl;
    file.open("piffle-paper.txt");
    while (getline(file, line)) {
        //cout << line << endl;
        ProfessorPifflePaperDeck.push_back(splitString(line));
-       
+       delete splitString(line);
    }
    file.close();
+   int CardIndex = 0;
 
-
+  
    cout << "Welcome to U-Can’t. Let the winnowing begin..." << endl;
-    
-   CCard* cardPtr;
+
+   cout << ProfessorPlagiaris.Name + " starts with " + ProfessorPlagiaristDeck[CardIndex]->GetFullname() << endl;
+   ProfessorPlagiaris.InHand.push_back(ProfessorPlagiaristDeck[CardIndex]);
+   cout << ProfessorPifflePaper.Name + " starts with " + ProfessorPifflePaperDeck[CardIndex]->GetFullname() << endl;
+   ProfessorPifflePaper.InHand.push_back(ProfessorPifflePaperDeck[CardIndex]);
+   CardIndex = 1;
+
    for (int i = 0; i < 30; i++) {
        int ran;
        cout << "Round " + to_string(i+1) << endl;
 
-       cardPtr = &ProfessorPlagiaristDeck[i];
-       cout << cardPtr->GetFullname() << endl;
-
-       if (i == 1) {
-           cout << ProfessorPifflePaper.Name + " starts with " + ProfessorPifflePaperDeck[i].GetFullname() << endl;
-           ProfessorPifflePaper.InHand.push_back(ProfessorPifflePaperDeck[i]);
-
-       }
-       else  if (i == 0) {
-           cout << ProfessorPlagiaris.Name + " starts with " + ProfessorPlagiaristDeck[i].GetFullname()<<endl;
-           ProfessorPlagiaris.InHand.push_back(ProfessorPlagiaristDeck[i]);
-       }
-
-
        //===========================================
-       cout << ProfessorPlagiaris.Name + " draws " + ProfessorPlagiaristDeck[i].GetFullname() << endl;
-       ProfessorPlagiaris.InHand.push_back(ProfessorPlagiaristDeck[i]);
-       ProfessorPifflePaper.Prestige = ProfessorPifflePaper.Prestige - ProfessorPlagiaris.InHand[i].GetPower();
-       cout << ProfessorPlagiaris.Name + " plays " + ProfessorPlagiaris.InHand[i].GetFullname() << endl;
-       cout << ProfessorPlagiaris.InHand[i].GetFullname() << " attacks " << ProfessorPifflePaper.Name << ". " << ProfessorPifflePaper.Name << " prestige is now " << ProfessorPifflePaper.Prestige << endl;
+       cout << ProfessorPlagiaris.Name + " draws " + ProfessorPlagiaristDeck[CardIndex]->GetFullname() << endl;
+       ProfessorPlagiaris.InHand.push_back(ProfessorPlagiaristDeck[CardIndex]);
+       ProfessorPifflePaper.Prestige = ProfessorPifflePaper.Prestige - ProfessorPlagiaris.InHand[i]->GetPower();
+       cout << ProfessorPlagiaris.Name + " plays " + ProfessorPlagiaris.InHand[i]->GetFullname() << endl;
+       cout << ProfessorPlagiaris.InHand[i]->GetFullname() << " attacks " << ProfessorPifflePaper.Name << ". " << ProfessorPifflePaper.Name << " prestige is now " << ProfessorPifflePaper.Prestige << endl;
        //===========================================
 
        //check
@@ -152,12 +150,12 @@ int main()
            break;
        }
        //===========================================
-       cout << ProfessorPifflePaper.Name + " draws " + ProfessorPifflePaperDeck[i].GetFullname() << endl;
-       ProfessorPifflePaper.InHand.push_back(ProfessorPifflePaperDeck[i]);
+       cout << ProfessorPifflePaper.Name + " draws " + ProfessorPifflePaperDeck[CardIndex]->GetFullname() << endl;
+       ProfessorPifflePaper.InHand.push_back(ProfessorPifflePaperDeck[CardIndex]);
        //ran = Random(ProfessorPifflePaper.InHand.size());
-       cout<< ProfessorPifflePaper.Name + " plays " + ProfessorPifflePaper.InHand[i].GetFullname() << endl;
-       ProfessorPlagiaris.Prestige = ProfessorPlagiaris.Prestige - ProfessorPlagiaris.InHand[i].GetPower();
-       cout << ProfessorPifflePaper.InHand[i].GetFullname() << " attacks " << ProfessorPlagiaris.Name << ". " << ProfessorPlagiaris.Name << " prestige is now " << ProfessorPlagiaris.Prestige << endl;
+       cout<< ProfessorPifflePaper.Name + " plays " + ProfessorPifflePaper.InHand[i]->GetFullname() << endl;
+       ProfessorPlagiaris.Prestige = ProfessorPlagiaris.Prestige - ProfessorPlagiaris.InHand[i]->GetPower();
+       cout << ProfessorPifflePaper.InHand[i]->GetFullname() << " attacks " << ProfessorPlagiaris.Name << ". " << ProfessorPlagiaris.Name << " prestige is now " << ProfessorPlagiaris.Prestige << endl;
        //===========================================
 
 
@@ -174,6 +172,8 @@ int main()
        if (i >= 30) {
            RoundsOver(ProfessorPlagiaris, ProfessorPifflePaper);
        }
+
+       CardIndex += 1;
    }
 
 
